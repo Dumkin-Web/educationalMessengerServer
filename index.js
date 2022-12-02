@@ -23,16 +23,15 @@ const start = () =>{
     try{
         server.listen(PORT, () => console.log(`Server started on port ${PORT}`));
         dbController.init();
+        initForTesting(); //убрать в проде
     }
     catch(e){
         console.log(e);
     }
 }
 
-start();
+start()//запуск сервера
 
-init();
-function init(){
-    //initialization of database
-    //and list of id's and phones
+function initForTesting(){
+    //console.log(Object.keys(dbController.users))
 }

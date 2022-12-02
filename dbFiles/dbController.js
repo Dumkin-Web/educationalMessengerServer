@@ -7,6 +7,7 @@ class dbController{
 
     static dialogs = {}
     static users = {}
+    static usernamePhone = {} //need to init
 
 
     //Работа с файлами бд
@@ -109,7 +110,7 @@ class dbController{
 
     static addNewContact({phone}, contact){ //change
         try{
-            if(this.userExistence(contact)){
+            if(this.userExistence(contact) && contact != phone && !this.users[phone].contacts.includes(contact)){
                 this.users[phone].contacts.push(contact)
                 this.saveData();
                 return true
@@ -127,14 +128,14 @@ class dbController{
                     if(this.users[b].isOnline){
                         return 0;
                     }
-                    return 1;
+                    return -1;
                 }
                 else{
                     if(this.users[b].isOnline){
-                        return -1;
+                        return 1;
                     }
 
-                    return Date(this.users[a].lastTimeOnline) - Date(this.users[b].lastTimeOnline)
+                    return Date(this.users[b].lastTimeOnline) - Date(this.users[a].lastTimeOnline)
                 }
             })
 

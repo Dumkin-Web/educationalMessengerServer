@@ -41,10 +41,9 @@ class mainController{
             }
             const decodeData = jwt.verify(token, secret)
 
+            if(dbController.addNewContact(decodeData, req.body.contact)) return res.status(200).json({message: 'Контакт добавлен'});
 
-            dbController.addNewContact(decodeData, req.body.contact)
-
-            return res.status(200).json({message: 'Контакт добавлен'})
+            return res.status(404).json({message: 'Пользователя с указанным номер телефона не существует или вы указали свой номер телефона'})
         } catch(e){
             return res.status(401).json({message: "Пользователь не авторизован"})
         }
