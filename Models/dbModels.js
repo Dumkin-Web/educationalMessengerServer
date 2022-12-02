@@ -11,6 +11,10 @@ module.exports = class User{
         this.lastTimeOnline = new Date()
         this.isOnline = false
     }
+
+    static getNonPrivateInfo({name, surname, imageBlob, lastTimeOnline, isOnline}){
+        return {name, surname, imageBlob, lastTimeOnline, isOnline}
+    }
 }
 
 class Dialog{

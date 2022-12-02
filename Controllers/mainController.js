@@ -49,7 +49,7 @@ class mainController{
         }
     }
 
-    async getStatusOfContacts(req, res){
+    getStatusOfContacts(req, res){
         try{
             const token = req.headers.authorization.split(' ')[1];
             if(!token){
@@ -57,9 +57,9 @@ class mainController{
             }
             const decodeData = jwt.verify(token, secret)
 
-            dbController.getStatusOfContacts(decodeData)
+            const responseData = dbController.getStatusOfContacts(decodeData);
 
-            return res.status(200).json({message: 'Данные успешно изменены'})//change
+            return res.status(200).json({message: 'Данные успешно изменены', data: responseData})//change
         } catch(e){
             return res.status(401).json({message: "Пользователь не авторизован"})
         }

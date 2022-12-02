@@ -33,7 +33,6 @@ class dbController{
         }
     }
 
-
     //
     static newUser(username, name, surname, phone, password, imageBlob) { //creating new user
         try{
@@ -135,11 +134,13 @@ class dbController{
                         return 1;
                     }
 
-                    return Date(this.users[b].lastTimeOnline) - Date(this.users[a].lastTimeOnline)
+                    return (new Date(this.users[b].lastTimeOnline)).getTime() - (new Date(this.users[a].lastTimeOnline)).getTime()
                 }
             })
 
-            console.log(data)
+            return data.map((contact) => {
+                return Object.assign({"phone": contact}, User.getNonPrivateInfo(this.users[contact]))
+            })
         }catch(e){
             throw new Error('Error getting and sorting contacts')
         }
