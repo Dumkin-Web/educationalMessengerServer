@@ -2,11 +2,11 @@ const dbController = require('./dbController')
 const bcryptjs = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const {secret} = require('../config')
+const { changeUserData } = require('./dbController')
 
 const generateAccesToken = (phone, name) => {
     const payload = {
-        phone,
-        name
+        phone
     }
 
     return jwt.sign(payload, secret, {expiresIn: "24h"})
@@ -45,14 +45,18 @@ class authController{
         try{
             const token = req.headers.authorization.split(' ')[1];
             if(!token){
-                res.status(403).json({message: "Пользователь не авторизован"})
+                res.status(401).json({message: "Пользователь не авторизован"})
             }
             const decodeData = jwt.verify(token, secret)
-            //const {username, name, surname, password, phone, imageBlob} = req.body
-            console.log(decodeData);
-            res.status(202).json('Все отработало')
+            
+            if(dbController.changeUserData(req.body, decodeData)){
+                res.status(200).json({message: 'Данные успешно изменены'})
+            }
+
+            res.status(500).json({message: "Ошибка при изменении данных"})
         } catch(e){
-            res.status(404).json({message: "Пользователь не"})
+            
+            res.status(401).json({message: "Пользователь не авторизован"})
         }
     }
 }

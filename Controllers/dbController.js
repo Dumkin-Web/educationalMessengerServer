@@ -12,7 +12,7 @@ class dbController{
         try{
             this.users = JSON.parse(fs.readFileSync(path.join(__dirname, '../dbFiles/users.json')));
             this.dialogs = JSON.parse(fs.readFileSync(path.join(__dirname, '../dbFiles/dialogs.json')));
-            console.log("Db was successefully initiated");
+            console.warn("\nDb was successefully initiated\n");
         }
         catch(e)
         {
@@ -84,6 +84,25 @@ class dbController{
     }
 
     static setOffline(){
+        try{
+
+        }catch(e){
+            
+        }
+    }
+
+    static changeUserData(body, {phone}){ //{username, name, surname, password, imageBlob}
+        try{
+            Object.assign(this.users[phone], body)
+            this.saveData();
+            return true
+
+        }catch(e){
+            return false
+        }
+    }
+
+    static getStatusOfContacts({phone}){
         try{
 
         }catch(e){

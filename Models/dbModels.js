@@ -4,7 +4,7 @@ module.exports = class User{
     constructor(name, surname, password, imageBlob){
         this.name = name
         this.surname = surname
-        this.password = password //добавить шифрование
+        this.password = password
         this.imageBlob = imageBlob
         this.dialogsIds = []
         this.contacts = []
