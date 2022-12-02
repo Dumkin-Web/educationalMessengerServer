@@ -8,6 +8,8 @@ class dbController{
     static dialogs = {}
     static users = {}
 
+
+    //Работа с файлами бд
     static init(){ //extracting actual db information in variables
         try{
             this.users = JSON.parse(fs.readFileSync(path.join(__dirname, '../dbFiles/users.json')));
@@ -30,6 +32,8 @@ class dbController{
         }
     }
 
+
+    //
     static newUser(username, name, surname, phone, password, imageBlob) { //creating new user
         try{
             if(!this.users[phone]){
@@ -44,7 +48,7 @@ class dbController{
             }
         }
         catch(e){
-            console.log(e)
+            console.log(e);
             throw new Error('Creating new user provided an error')
         }
 
@@ -55,7 +59,7 @@ class dbController{
             if(this.users[phone]) return this.users[phone]
             return false
         }catch(e){
-            console.log(e)
+            throw new Error('Error via searching of user')
         }
     }
 
@@ -63,7 +67,7 @@ class dbController{
         try{
 
         }catch(e){
-
+            throw new Error('')
         }
     }
 
@@ -71,15 +75,17 @@ class dbController{
         try{
 
         }catch(e){
-            
+            throw new Error('')
         }
     }
 
+
+    //Действия с аккаунтом пользователя
     static setOnline(){
         try{
 
         }catch(e){
-            
+            throw new Error('')
         }
     }
 
@@ -87,26 +93,54 @@ class dbController{
         try{
 
         }catch(e){
-            
+            throw new Error('')
         }
     }
 
-    static changeUserData(body, {phone}){ //{username, name, surname, password, imageBlob}
+    static changeUserData(body, {phone}){
         try{
             Object.assign(this.users[phone], body)
             this.saveData();
-            return true
 
         }catch(e){
+            throw new Error('Error via changing data')
+        }
+    }
+
+    static addNewContact({phone}, contact){ //change
+        try{
+            if(this.userExistence(contact)){
+                this.users[phone].contacts.push(contact)
+                this.saveData();
+                return true
+            }
             return false
+        }catch(e){
+            throw new Error('Error via adding new contact')
         }
     }
 
     static getStatusOfContacts({phone}){
         try{
+            const data = this.users[phone].contacts.sort((a, b) =>{
+                if(this.users[a].isOnline){
+                    if(this.users[b].isOnline){
+                        return 0;
+                    }
+                    return 1;
+                }
+                else{
+                    if(this.users[b].isOnline){
+                        return -1;
+                    }
 
+                    return Date(this.users[a].lastTimeOnline) - Date(this.users[b].lastTimeOnline)
+                }
+            })
+
+            console.log(data)
         }catch(e){
-            
+            throw new Error('Error getting and sorting contacts')
         }
     }
 }

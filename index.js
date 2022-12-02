@@ -2,8 +2,9 @@ const express = require('express');
 const dotenv = require('dotenv');
 const http = require("http");
 const webSocketServer = require('./Controllers/webSocketController');
-const dbController = require('./Controllers/dbController');
+const dbController = require('./dbFiles/dbController');
 const authRouter = require('./Routers/authRouter');
+const mainRouter = require('./Routers/mainRouter');
 
 
 dotenv.config();
@@ -15,7 +16,8 @@ const server = http.createServer(app); //creating http Server
 const wsServer = new webSocketServer(server); //creating WebSocket Server
 
 app.use(express.json());
-app.use('/auth', authRouter) //using router
+app.use('/auth', authRouter) //роутер для регистрации и авторизации
+app.use('/api', mainRouter) //роутер для доступа к функциям сервера
 
 const start = () =>{
     try{
@@ -29,7 +31,7 @@ const start = () =>{
 
 start();
 
-init(); //
+init();
 function init(){
     //initialization of database
     //and list of id's and phones

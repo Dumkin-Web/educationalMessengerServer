@@ -1,8 +1,8 @@
-const dbController = require('./dbController')
+const dbController = require('../dbFiles/dbController')
 const bcryptjs = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const {secret} = require('../config')
-const { changeUserData } = require('./dbController')
+const { changeUserData } = require('../dbFiles/dbController')
 
 const generateAccesToken = (phone, name) => {
     const payload = {
@@ -17,13 +17,17 @@ class authController{
         try{
             const {username, name, surname, password, phone, imageBlob} = req.body
 
+            //проверка данных
+            if(!password || !phone || !username || !name || !surname) return res.status(400).json({message: "Ошибка данных"});
+
             const hashPassword = bcryptjs.hashSync(password, 7)
 
-            const response = dbController.newUser(username, name, surname, phone, hashPassword, imageBlob)
+            if(dbController.newUser(username, name, surname, phone, hashPassword, imageBlob)) return res.status(201).json({message: "Пользователь успешно зарегестрирован!"});
 
-            response ? res.status(201).json({message: "Пользователь успешно зарегестрирован!"}) : res.status(400).json({message: "Похоже, вы уже зарегистрированы в системе"});
+            return res.status(400).json({message: "Похоже, вы уже зарегистрированы в системе"});
         } catch(e){
-
+            console.log(e);
+            return res.status(500).json({message: 'Ошибка сервера'})
         }
     }
 
@@ -33,30 +37,11 @@ class authController{
             const user = dbController.userExistence(phone);
             if(user && bcryptjs.compareSync(password, user.password)){
                 const token = generateAccesToken(phone, user.name)
-                res.status(200).json({message: "Авторизация прошла успешно", token: token})
+                return res.status(200).json({message: "Авторизация прошла успешно", token: token})
             }
-            res.status(400).json({message: "Invailid phone number or password"})
+            return res.status(400).json({message: "Invailid phone number or password"})
         } catch(e){
-            
-        }
-    }
-
-    async settings(req, res){
-        try{
-            const token = req.headers.authorization.split(' ')[1];
-            if(!token){
-                res.status(401).json({message: "Пользователь не авторизован"})
-            }
-            const decodeData = jwt.verify(token, secret)
-            
-            if(dbController.changeUserData(req.body, decodeData)){
-                res.status(200).json({message: 'Данные успешно изменены'})
-            }
-
-            res.status(500).json({message: "Ошибка при изменении данных"})
-        } catch(e){
-            
-            res.status(401).json({message: "Пользователь не авторизован"})
+            return res.status(500).json({message: 'Ошибка сервера'})
         }
     }
 }

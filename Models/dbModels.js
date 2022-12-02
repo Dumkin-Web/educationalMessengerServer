@@ -2,10 +2,10 @@ const { v4: uuidv4 } = require('uuid');
 
 module.exports = class User{
     constructor(name, surname, password, imageBlob){
-        this.name = name
-        this.surname = surname
+        this.name = name ?? "Имя"
+        this.surname = surname ?? "Фамилия"
         this.password = password
-        this.imageBlob = imageBlob
+        this.imageBlob = imageBlob ?? "none"
         this.dialogsIds = []
         this.contacts = []
         this.lastTimeOnline = new Date()
