@@ -8,8 +8,8 @@ const generateAccesToken = (phone, name) => {
     const payload = {
         phone
     }
-
-    return jwt.sign(payload, secret, {expiresIn: "24h"})
+    console.log(process.env.SECRET)
+    return jwt.sign(payload, process.env.SECRET, {expiresIn: "24h"})
 }
 
 class authController{

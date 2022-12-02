@@ -1,14 +1,16 @@
 const dbController = require('../dbFiles/dbController')
 const bcryptjs = require('bcryptjs')
 const jwt = require('jsonwebtoken')
-const {secret} = require('../config')
 const { changeUserData } = require('../dbFiles/dbController')
 
 const jsonVerify = (token) =>{ //проверка токена
     if(!token){
         throw new Error('Токен отсутствует')
     }
-    return decodeData = jwt.verify(token, secret)
+
+    console.log(process.env.SECRET)
+
+    return decodeData = jwt.verify(token, process.env.SECRET)
 }
 
 class mainController{
