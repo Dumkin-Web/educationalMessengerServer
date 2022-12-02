@@ -1,15 +1,13 @@
-const dbController = require('../dbFiles/dbController')
+const dbController = require('../db/dbController')
 const bcryptjs = require('bcryptjs')
 const jwt = require('jsonwebtoken')
-const {secret} = require('../config')
-const { changeUserData } = require('../dbFiles/dbController')
+const { changeUserData } = require('../db/dbController')
 
 const generateAccesToken = (phone, name) => {
     const payload = {
         phone
     }
-    console.log(process.env.SECRET)
-    return jwt.sign(payload, process.env.SECRET, {expiresIn: "24h"})
+    return jwt.sign(payload, process.env.JWT_ACCES_SECRET, {expiresIn: "24h"})
 }
 
 class authController{
@@ -35,6 +33,7 @@ class authController{
         try{
             const {phone, password} = req.body
             const user = dbController.userExistence(phone);
+            console.log(user);
             if(user && bcryptjs.compareSync(password, user.password)){
                 const token = generateAccesToken(phone, user.name)
                 return res.status(200).json({message: "Авторизация прошла успешно", token: token})

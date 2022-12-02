@@ -1,16 +1,14 @@
-const dbController = require('../dbFiles/dbController')
+const dbController = require('../db/dbController')
 const bcryptjs = require('bcryptjs')
 const jwt = require('jsonwebtoken')
-const { changeUserData } = require('../dbFiles/dbController')
+const { changeUserData } = require('../db/dbController')
 
 const jsonVerify = (token) =>{ //проверка токена
     if(!token){
         throw new Error('Токен отсутствует')
     }
 
-    console.log(process.env.SECRET)
-
-    return decodeData = jwt.verify(token, process.env.SECRET)
+    return decodeData = jwt.verify(token, process.env.JWT_ACCES_SECRET)
 }
 
 class mainController{
@@ -37,11 +35,7 @@ class mainController{
     async addNewContacts(req, res){//добавление нового контакта
         try{
             //проверка токена
-            const token = req.headers.authorization.split(' ')[1];
-            if(!token){
-                return res.status(401).json({message: "Пользователь не авторизован"})
-            }
-            const decodeData = jwt.verify(token, secret)
+            const decodeData = jsonVerify(req.headers.authorization.split(' ')[1])
 
             if(dbController.addNewContact(decodeData, req.body.contact)) return res.status(200).json({message: 'Контакт добавлен'});
 
@@ -53,11 +47,7 @@ class mainController{
 
     getStatusOfContacts(req, res){
         try{
-            const token = req.headers.authorization.split(' ')[1];
-            if(!token){
-                return res.status(401).json({message: "Пользователь не авторизован"})
-            }
-            const decodeData = jwt.verify(token, secret)
+            const decodeData = jsonVerify(req.headers.authorization.split(' ')[1])
 
             const responseData = dbController.getStatusOfContacts(decodeData);
 

@@ -1,7 +1,9 @@
 const fs = require('fs');
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');
-const User = require('../Models/dbModels')
+const User = require('../Models/UserModel')
+const Message = require('../Models/MessageModel')
+const Dialog = require('../Models/DialogModel')
 
 class dbController{
 
@@ -12,9 +14,26 @@ class dbController{
 
     //Работа с файлами бд
     static init(){ //extracting actual db information in variables
+
+        const initUsernamesAndPhone = () =>{
+            const temp = {}
+            Object.keys(this.users).forEach((phone) =>{
+                const nickname = this.users[phone].username
+                temp[nickname] = phone
+            })
+            return temp
+        }
+
+
         try{
-            this.users = JSON.parse(fs.readFileSync(path.join(__dirname, '../dbFiles/users.json')));
-            this.dialogs = JSON.parse(fs.readFileSync(path.join(__dirname, '../dbFiles/dialogs.json')));
+            //INIT USERS
+            this.users = JSON.parse(fs.readFileSync(path.join(__dirname, '../db/users.json')));
+            //INIT DIALOGS
+            this.dialogs = JSON.parse(fs.readFileSync(path.join(__dirname, '../db/dialogs.json')));
+            //INIT MATCH DB BETWEEN USERNAMES AND PHONE NUMBERS
+            this.usernamePhone = initUsernamesAndPhone();
+
+
             console.warn("\nDb was successefully initiated\n");
         }
         catch(e)
@@ -25,8 +44,10 @@ class dbController{
 
     static saveData(){ //saving actual db information in files
         try{
-            fs.writeFileSync(path.join(__dirname, '../dbFiles/users.json'), JSON.stringify(this.users));
-            fs.writeFileSync(path.join(__dirname, '../dbFiles/dialogs.json'), JSON.stringify(this.dialogs));
+            //SAVING USERS
+            fs.writeFileSync(path.join(__dirname, '../db/users.json'), JSON.stringify(this.users));
+            //SAVING DIALOGS
+            fs.writeFileSync(path.join(__dirname, '../db/dialogs.json'), JSON.stringify(this.dialogs));
         }
         catch(e){
             throw new Error('Db saving problem')
@@ -37,7 +58,7 @@ class dbController{
     static newUser(username, name, surname, phone, password, imageBlob) { //creating new user
         try{
             if(!this.users[phone]){
-                this.users[phone] = new User(name, surname, password, imageBlob);
+                this.users[phone] = new User(username, name, surname, password, imageBlob);
                 console.log("new user created");
                 this.saveData();
                 return true

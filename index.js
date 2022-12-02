@@ -1,8 +1,8 @@
 const express = require('express');
 const dotenv = require('dotenv');
 const http = require("http");
-const webSocketServer = require('./Controllers/webSocketController');
-const dbController = require('./dbFiles/dbController');
+const webSocketServer = require('./WSService/webSocketServer');
+const dbController = require('./db/dbController');
 const authRouter = require('./Routers/authRouter');
 const mainRouter = require('./Routers/mainRouter');
 
