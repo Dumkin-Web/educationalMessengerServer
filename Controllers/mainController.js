@@ -1,9 +1,9 @@
 const dbController = require('../db/dbController')
 const bcryptjs = require('bcryptjs')
 const jwt = require('jsonwebtoken')
-const { changeUserData } = require('../db/dbController')
+// const { changeUserData } = require('../db/dbController')
 
-const jsonVerify = (token) =>{ //проверка токена
+const jwtVerify = (token) =>{ //проверка токена
     if(!token){
         throw new Error('Токен отсутствует')
     }
@@ -15,7 +15,7 @@ class mainController{
 
     async changeSettings(req, res){//изменение данных профиля пользователя
         try{
-            const decodeData = jsonVerify(req.headers.authorization.split(' ')[1])
+            const decodeData = jwtVerify(req.headers.authorization.split(' ')[1])
             
             try{
                 dbController.changeUserData(req.body, decodeData)
@@ -35,7 +35,7 @@ class mainController{
     async addNewContacts(req, res){//добавление нового контакта
         try{
             //проверка токена
-            const decodeData = jsonVerify(req.headers.authorization.split(' ')[1])
+            const decodeData = jwtVerify(req.headers.authorization.split(' ')[1])
 
             if(dbController.addNewContact(decodeData, req.body.contact)) return res.status(200).json({message: 'Контакт добавлен'});
 
@@ -47,7 +47,7 @@ class mainController{
 
     getStatusOfContacts(req, res){
         try{
-            const decodeData = jsonVerify(req.headers.authorization.split(' ')[1])
+            const decodeData = jwtVerify(req.headers.authorization.split(' ')[1])
 
             const responseData = dbController.getStatusOfContacts(decodeData);
 

@@ -1,39 +1,34 @@
 const WebSocket = require( "ws");
+const MessageHandler = require('./WSMessageHandlers')
+const dbController = require('../db/dbController')
 
 module.exports = class webSocketServer{
     constructor(server){
         this.wsServer = new WebSocket.Server({ server });
 
-        this.wsServer.on('connection', ws => {
+        this.wsServer.on('connection', (ws,req) => {
 
-            ws.on('message', (message) => {
-                message = String(message)
-                const data = JSON.parse(message);
+            MessageHandler.jwtVerify(req, ws) //проверка токена и выдача нового
+            .then((phone) => {
+                dbController.savePhoneAndWS(phone, ws); //сохранение ассоциации телефона и соккета в статическую переменную 
 
-                switch (data.header){
-                    case 'message':
-                        //handler
-                        break;
-                    case 'auth':
-                        //handler
-                        break;
-                    case 'allMessages':
-                        //handler
-                        break;
-                    default:
-                        break;
-                }
 
+                ws.on('message', (message) => {
+                    message = String(message)
+                    const data = JSON.parse(message);
+    
+                    MessageHandler.handler(data, ws, req)
+    
+                })
             })
-
-            ws.on('message', m => {
-                //handler
-            });
+            .catch( e => {
+                ws.close(1013, "Пользователь не авторизован")
+            })
          
             ws.on("error", e => ws.send(e));
             
             ws.on('close', e =>{
-                console.log('connection lost')
+                dbController.deletePhoneAndWS(ws);
             })
 
         });

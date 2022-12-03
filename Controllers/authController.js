@@ -33,7 +33,7 @@ class authController{
         try{
             const {phone, password} = req.body
             const user = dbController.userExistence(phone);
-            console.log(user);
+            console.log(user + "hahaha");
             if(user && bcryptjs.compareSync(password, user.password)){
                 const token = generateAccesToken(phone, user.name)
                 return res.status(200).json({message: "Авторизация прошла успешно", token: token})

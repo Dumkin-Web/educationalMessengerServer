@@ -10,6 +10,7 @@ class dbController{
     static dialogs = {}
     static users = {}
     static usernamePhone = {} //need to init
+    static phoneWS = {}
 
 
     //Работа с файлами бд
@@ -42,7 +43,7 @@ class dbController{
         }
     }
 
-    static saveData(){ //saving actual db information in files
+    static #saveData(){ //saving actual db information in files
         try{
             //SAVING USERS
             fs.writeFileSync(path.join(__dirname, '../db/users.json'), JSON.stringify(this.users));
@@ -60,7 +61,7 @@ class dbController{
             if(!this.users[phone]){
                 this.users[phone] = new User(username, name, surname, password, imageBlob);
                 console.log("new user created");
-                this.saveData();
+                this.#saveData();
                 return true
             }
             else{
@@ -121,7 +122,7 @@ class dbController{
     static changeUserData(body, {phone}){
         try{
             Object.assign(this.users[phone], body)
-            this.saveData();
+            this.#saveData();
 
         }catch(e){
             throw new Error('Error via changing data')
@@ -132,7 +133,7 @@ class dbController{
         try{
             if(this.userExistence(contact) && contact != phone && !this.users[phone].contacts.includes(contact)){
                 this.users[phone].contacts.push(contact)
-                this.saveData();
+                this.#saveData();
                 return true
             }
             return false
@@ -165,6 +166,18 @@ class dbController{
         }catch(e){
             throw new Error('Error getting and sorting contacts')
         }
+    }
+
+    static savePhoneAndWS(phone, ws){
+        ws.userPhonePrivateProperty = phone
+        this.phoneWS[phone] = ws;
+        console.log(this.phoneWS)
+    }
+
+    static deletePhoneAndWS({userPhonePrivateProperty}){
+        delete this.phoneWS[userPhonePrivateProperty]
+        console.log("После удаления")
+        console.log(this.phoneWS)
     }
 }
 
