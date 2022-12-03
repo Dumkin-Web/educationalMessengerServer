@@ -133,6 +133,7 @@ class dbController{
         try{
             if(this.userExistence(contact) && contact != phone && !this.users[phone].contacts.includes(contact)){
                 this.users[phone].contacts.push(contact)
+                this.users[contact].inContacts.push(phone)
                 this.#saveData();
                 return true
             }
@@ -171,13 +172,10 @@ class dbController{
     static savePhoneAndWS(phone, ws){
         ws.userPhonePrivateProperty = phone
         this.phoneWS[phone] = ws;
-        console.log(this.phoneWS)
     }
 
     static deletePhoneAndWS({userPhonePrivateProperty}){
         delete this.phoneWS[userPhonePrivateProperty]
-        console.log("После удаления")
-        console.log(this.phoneWS)
     }
 }
 

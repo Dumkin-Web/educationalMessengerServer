@@ -14,10 +14,10 @@ module.exports = class webSocketServer{
 
 
                 ws.on('message', (message) => {
-                    message = String(message)
-                    const data = JSON.parse(message);
+                    message = String(message) //преобрахование сообщение
+                    const data = JSON.parse(message); //
     
-                    MessageHandler.handler(data, ws, req)
+                    MessageHandler.handler(data, ws, req) //обработка сообщения
     
                 })
             })
@@ -25,7 +25,7 @@ module.exports = class webSocketServer{
                 ws.close(1013, "Пользователь не авторизован")
             })
          
-            ws.on("error", e => ws.send(e));
+            ws.on("error", e =>  ws.send(response.response("onError", "serverError")));
             
             ws.on('close', e =>{
                 dbController.deletePhoneAndWS(ws);

@@ -11,6 +11,7 @@ module.exports = class User{
         this.contacts = []
         this.lastTimeOnline = new Date()
         this.isOnline = false
+        this.inContacts = [] //
     }
 
     static getNonPrivateInfo({username, name, surname, imageBlob, lastTimeOnline, isOnline}){

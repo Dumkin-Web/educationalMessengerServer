@@ -19,29 +19,42 @@ module.exports = class MessageHandler{
             }
             const newJWT = jwt.sign(payload, process.env.JWT_ACCES_SECRET, {expiresIn: "24h"})
 
-            ws.send(JSON.stringify(new response("newJwt", newJWT)))
+            ws.send(response.response("newJwt", newJWT))
 
             resolve(decodeData.phone)
         })
     }
 
-    static handler(data, ws, req){
+    static handler(data, ws, req){ //обработчик запросов соккета
 
         this.jwtVerify(req, ws)
+        .then( phone => {
+            try{
+                switch (data.route){ // роуты соккета
+                    case 'newMessage':
+                        this.newMessage(data, ws)
+                        break;
+                    
+                    default:
+                        ws.send(response.response("onError", "routeNotFound"))
+                        break;
+                }
+            }
+            catch(e){
+                ws.send(response.response("onError", "wsRouteError"))
+            }
+        })
+        .catch(e => {
+            ws.close(1013, "Пользователь не авторизован")
+        })
 
-        switch (data.header){
-            case 'message':
-                //handler
-                break;
-            case 'auth':
-                //handler
-                break;
-            case 'allMessages':
-                //handler
-                break;
-            default:
-                break;
-        }
+    }
 
+    static disconnect(phone, ws){ // доделать
+
+    }
+
+    static newMessage({payload}, ws){
+        //обработка сообщения
     }
 }
