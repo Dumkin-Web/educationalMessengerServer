@@ -11,11 +11,11 @@ module.exports = class webSocketServer{
             MessageHandler.jwtVerify(req, ws) //проверка токена и выдача нового
             .then((phone) => {
                 dbController.savePhoneAndWS(phone, ws); //сохранение ассоциации телефона и соккета в статическую переменную 
-
+                dbController.setOnline(phone); //изменение стевого статуса
 
                 ws.on('message', (message) => {
                     message = String(message) //преобрахование сообщение
-                    const data = JSON.parse(message); //
+                    const data = JSON.parse(message); // парсинг сообщения
     
                     MessageHandler.handler(data, ws, req) //обработка сообщения
     
@@ -28,7 +28,10 @@ module.exports = class webSocketServer{
             ws.on("error", e =>  ws.send(response.response("onError", "serverError")));
             
             ws.on('close', e =>{
-                dbController.deletePhoneAndWS(ws);
+                if(e != 1013){
+                    dbController.setOffline(ws) //изменение сетевого статуса
+                }
+                dbController.deletePhoneAndWS(ws); //удаление ассоциации телефона и соккета в статическую переменную 
             })
 
         });

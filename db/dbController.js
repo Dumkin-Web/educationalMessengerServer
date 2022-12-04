@@ -25,6 +25,13 @@ class dbController{
             return temp
         }
 
+        const initSetOffline = () => {
+            Object.keys(this.users).forEach((phone) => {
+                this.users[phone].isOnline = false;
+                this.users[phone].lastTimeOnline = Date();
+            })
+            //this.#saveData() //enable on prod
+        }
 
         try{
             //INIT USERS
@@ -34,7 +41,7 @@ class dbController{
             //INIT MATCH DB BETWEEN USERNAMES AND PHONE NUMBERS
             this.usernamePhone = initUsernamesAndPhone();
 
-
+            initSetOffline()
             console.warn("\nDb was successefully initiated\n");
         }
         catch(e)
@@ -51,7 +58,7 @@ class dbController{
             fs.writeFileSync(path.join(__dirname, '../db/dialogs.json'), JSON.stringify(this.dialogs));
         }
         catch(e){
-            throw new Error('Db saving problem')
+            // throw new Error('Db saving problem') //СПОРНОЕ РЕШЕНИЕ
         }
     }
 
@@ -85,37 +92,22 @@ class dbController{
         }
     }
 
-    static newDialog(){
-        try{
-
-        }catch(e){
-            throw new Error('')
-        }
-    }
-
-    static newMessage(){
-        try{
-
-        }catch(e){
-            throw new Error('')
-        }
-    }
-
 
     //Действия с аккаунтом пользователя
-    static setOnline(){
+    static setOnline(phone){
         try{
-
+            this.users[phone].isOnline = true;
         }catch(e){
             throw new Error('')
         }
     }
 
-    static setOffline(){
+    static setOffline({userPhonePrivateProperty}){
         try{
-
+            this.users[userPhonePrivateProperty].isOnline = false;
+            this.users[userPhonePrivateProperty].lastTimeOnline = Date();
         }catch(e){
-            throw new Error('')
+            console.log(e)
         }
     }
 
@@ -169,13 +161,82 @@ class dbController{
         }
     }
 
+    //WS
     static savePhoneAndWS(phone, ws){
-        ws.userPhonePrivateProperty = phone
-        this.phoneWS[phone] = ws;
+        try{
+            ws.userPhonePrivateProperty = phone
+            this.phoneWS[phone] = ws;
+        }
+        catch(e)
+        {
+            
+        }
     }
 
     static deletePhoneAndWS({userPhonePrivateProperty}){
-        delete this.phoneWS[userPhonePrivateProperty]
+        try{
+            delete this.phoneWS[userPhonePrivateProperty]
+        }
+        catch(e)
+        {
+
+        }
+    }
+
+    static newDialog(phone, {dialog_name, type, members, imageBlob, admin_id}){
+        try{
+            members.forEach((member) => {
+                if(!this.userExistence(member)) throw new Error('Пользователь не существует')
+            })
+
+            const newDialog = new Dialog(dialog_name, type, members, imageBlob, admin_id)
+            this.dialogs[newDialog.dialog_id] = newDialog
+            this.users[phone].dialogsIds.push(newDialog.dialog_id)
+
+            //this.#saveData() //ENABLE ON PROD
+
+            return newDialog
+        }catch(e){
+            throw new Error('Пользователь не существует')
+        }
+    }
+
+    static newMessage({dialog_id, user_id, message_text, type, read, edited, media, tags}){
+        try{
+            const newMessage = new Message(user_id, message_text, type, read, edited, media, tags)
+            this.dialogs[dialog_id].messages[newMessage.message_id] = newMessage
+            this.dialogs[dialog_id].lastMessageTime = newMessage.time
+            //this.#saveData() //ENABLE ON PROD
+
+            return newMessage
+        }catch(e){
+            throw new Error('')
+        }
+    }
+
+    static getDialog(dialog_id){
+        try{
+            return this.dialogs[dialog_id]
+        }catch(e){
+            throw new Error('')
+        }
+    }
+
+    static getAllDialogs(user_id){
+        try{
+            const allDialogs = []
+            for(dialog_id in this.dialogs){
+                if(this.dialogs[dialog_id].members.includes(user_id)){
+                    allDialogs.push(this.dialogs[dialog_id])
+                }
+            }
+
+            allDialogs.sort((a, b) => {
+                return +a.lastMessageTime - +b.lastMessageTime
+            })
+        }catch(e){
+            throw new Error('')
+        }
     }
 }
 

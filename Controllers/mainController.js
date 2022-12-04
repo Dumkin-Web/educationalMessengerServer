@@ -51,7 +51,7 @@ class mainController{
 
             const responseData = dbController.getStatusOfContacts(decodeData);
 
-            return res.status(200).json({message: 'Данные успешно изменены', data: responseData})//change
+            return res.status(200).json({message: 'Статус пользователей в контактах', data: responseData})
         } catch(e){
             return res.status(401).json({message: "Пользователь не авторизован"})
         }

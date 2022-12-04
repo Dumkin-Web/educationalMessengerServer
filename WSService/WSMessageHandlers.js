@@ -1,4 +1,5 @@
-const jwt = require('jsonwebtoken')
+const jwt = require('jsonwebtoken');
+const dbController = require('../db/dbController');
 const response = require('../Models/wsResponseModels')
 
 module.exports = class MessageHandler{
@@ -31,10 +32,24 @@ module.exports = class MessageHandler{
         .then( phone => {
             try{
                 switch (data.route){ // роуты соккета
+
+                    //CREATE
                     case 'newMessage':
                         this.newMessage(data, ws)
                         break;
-                    
+                    case 'newDialog':
+                        this.newDialog(data, ws)
+                        break;
+
+                    //GET
+                    case 'getMessages':
+                        this.newMessage(data, ws)
+                        break;
+                    case 'getDialogs':
+                        this.newDialog(data, ws)
+                        break;
+
+                    //DEFAULT
                     default:
                         ws.send(response.response("onError", "routeNotFound"))
                         break;
@@ -50,11 +65,36 @@ module.exports = class MessageHandler{
 
     }
 
-    static disconnect(phone, ws){ // доделать
+    static newMessage({payload}, ws){
+        try{
+            const newMessage = dbController.newMessage(payload)
+            const payload = {
+                newMessage,
+                //fullDialog here
+            }
+            ws.send(response.response("newMessage", ))
+        }catch(e){
+            ws.send(response.response("onError", "newMessageNotSended"))
+        }
+    }
+
+    static newDialog({payload}, ws){
+        try{
+            const newDialog = dbController.newDialog(ws.userPhonePrivateProperty, payload)
+        }catch(e){
+            ws.send(response.response("onError", "userIsNotExisting"))
+        }
+    }
+
+
+
+
+    //NETWORK STATUS CHANGING //TODO
+    static onOnline(){
 
     }
 
-    static newMessage({payload}, ws){
-        //обработка сообщения
+    static onOffline(){
+
     }
 }
