@@ -4,7 +4,8 @@
   "description": "WS server with http upgrade for messenger",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon index.js",
+    "ignore": "nodemon --ignore 'db/*.json'",
+    "dev": "nodemon index.js --ignore 'db/*.json'",
     "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

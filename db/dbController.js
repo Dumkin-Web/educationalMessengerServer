@@ -185,15 +185,22 @@ class dbController{
 
     static newDialog(phone, {dialog_name, type, members, imageBlob, admin_id}){
         try{
+            const newMembers = new Set();
+            newMembers.add(phone)
             members.forEach((member) => {
                 if(!this.userExistence(member)) throw new Error('Пользователь не существует')
+                newMembers.add(member)
             })
+            members = Array.from(newMembers)
 
             const newDialog = new Dialog(dialog_name, type, members, imageBlob, admin_id)
             this.dialogs[newDialog.dialog_id] = newDialog
-            this.users[phone].dialogsIds.push(newDialog.dialog_id)
 
-            //this.#saveData() //ENABLE ON PROD
+            members.forEach((phone) =>{
+                this.users[phone].dialogsIds.push(newDialog.dialog_id)
+            })
+
+            this.#saveData()
 
             return newDialog
         }catch(e){
@@ -201,12 +208,13 @@ class dbController{
         }
     }
 
-    static newMessage({dialog_id, user_id, message_text, type, read, edited, media, tags}){
+    static newMessage({dialog_id, user_id, message_text, type, media, tags}){
         try{
-            const newMessage = new Message(user_id, message_text, type, read, edited, media, tags)
+            const newMessage = new Message(user_id, message_text, type, media, tags)
             this.dialogs[dialog_id].messages[newMessage.message_id] = newMessage
             this.dialogs[dialog_id].lastMessageTime = newMessage.time
-            //this.#saveData() //ENABLE ON PROD
+
+            this.#saveData()
 
             return newMessage
         }catch(e){
@@ -222,21 +230,33 @@ class dbController{
         }
     }
 
-    static getAllDialogs(user_id){
+    static getAllDialogs(phone){
         try{
             const allDialogs = []
-            for(dialog_id in this.dialogs){
-                if(this.dialogs[dialog_id].members.includes(user_id)){
-                    allDialogs.push(this.dialogs[dialog_id])
-                }
-            }
+            this.users[phone].dialogsIds.forEach((dialog_id) => {
+                allDialogs.push(this.dialogs[dialog_id])
+            })
 
             allDialogs.sort((a, b) => {
-                return +a.lastMessageTime - +b.lastMessageTime
+                return +b.lastMessageTime - +a.lastMessageTime
             })
+
+
+            console.log("Sorting");
+            console.log(allDialogs.length)
+            allDialogs.forEach((dialog) => {
+                console.log(new Date(dialog.lastMessageTime))
+            })
+
+            return allDialogs
         }catch(e){
             throw new Error('')
         }
+    }
+
+    static getMessages({dialog_id}){
+        
+        return Object.values(this.dialogs[dialog_id].messages)
     }
 }
 

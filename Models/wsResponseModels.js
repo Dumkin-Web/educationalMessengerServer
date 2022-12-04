@@ -1,6 +1,6 @@
 class wsResponse{
-    constructor(header, payload){
-        this.header = header
+    constructor(route, payload){
+        this.route = route
         this.payload = payload
     }
 
@@ -8,8 +8,8 @@ class wsResponse{
         return JSON.stringify(this)
     }
 
-    static response(header, payload){
-        return (new wsResponse(header, payload)).#stringifyRespons()
+    static response(route, payload){
+        return (new wsResponse(route, payload)).#stringifyRespons()
     }
 }
 

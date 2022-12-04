@@ -43,10 +43,10 @@ module.exports = class MessageHandler{
 
                     //GET
                     case 'getMessages':
-                        this.newMessage(data, ws)
+                        this.getMessages(data, ws)
                         break;
                     case 'getDialogs':
-                        this.newDialog(data, ws)
+                        this.getDialogs(data, ws)
                         break;
 
                     //DEFAULT
@@ -56,6 +56,7 @@ module.exports = class MessageHandler{
                 }
             }
             catch(e){
+                console.log(e)
                 ws.send(response.response("onError", "wsRouteError"))
             }
         })
@@ -67,26 +68,82 @@ module.exports = class MessageHandler{
 
     static newMessage({payload}, ws){
         try{
+            console.log("New message");
             const newMessage = dbController.newMessage(payload)
-            const payload = {
-                newMessage,
-                //fullDialog here
-            }
-            ws.send(response.response("newMessage", ))
+            const dialog = dbController.getDialog(payload.dialog_id)
+            
+            dialog.members.forEach((phone) => {
+
+                const responsePayload = {
+                    newMessage,
+                    dialog,
+                    allDialogs: dbController.getAllDialogs(phone)
+                }
+
+                try{
+                    dbController.phoneWS[phone].send(response.response("newMessage", responsePayload))
+                }
+                catch(e){
+
+                }
+            })
         }catch(e){
+            console.log(e)
             ws.send(response.response("onError", "newMessageNotSended"))
         }
     }
 
     static newDialog({payload}, ws){
         try{
-            const newDialog = dbController.newDialog(ws.userPhonePrivateProperty, payload)
+            console.log("New dialog");
+            let dialogExists = false
+            if(payload.type == "Dialog"){ //Если создается диалог, то проверяется наличие такового в БД
+                dbController.users[ws.userPhonePrivateProperty].dialogsIds.forEach( dialog_id => {
+                    if(dbController.users[payload.members[0]].dialogsIds.includes(dialog_id)) dialogExists = true
+                })
+            }
+
+            if(!dialogExists) //Если диалог существует, то новый не создается
+            {
+                const newDialog = dbController.newDialog(ws.userPhonePrivateProperty, payload)
+
+                newDialog.members.forEach((phone) => {
+
+                    const responsePayload = {
+                        newDialog: newDialog,
+                        allDialogs: dbController.getAllDialogs(phone)
+                    }
+
+                    try{
+                        dbController.phoneWS[phone].send(response.response("newDialog", responsePayload))
+                    }
+                    catch(e){
+                        
+                    }
+                })
+            }
+            else{
+                ws.send(response.response("onError", "dialogExists"))
+            }
         }catch(e){
+            console.log(e)
             ws.send(response.response("onError", "userIsNotExisting"))
         }
     }
 
+    static getMessages({payload}, ws){
+        ws.send(response.response("getMessages", dbController.getMessages(payload)))
+    }
 
+    static getDialogs({payload}, ws){
+        try{
+            console.log("Get all dialogs");
+            ws.send(response.response("getDialogs",dbController.getAllDialogs(ws.userPhonePrivateProperty)))
+        }
+        catch(e){
+
+        }
+    }
 
 
     //NETWORK STATUS CHANGING //TODO
