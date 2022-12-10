@@ -14,11 +14,15 @@ module.exports = class webSocketServer{
                 dbController.setOnline(phone); //изменение стевого статуса
 
                 ws.on('message', (message) => {
-                    message = String(message) //преобрахование сообщение
-                    const data = JSON.parse(message); // парсинг сообщения
-    
-                    MessageHandler.handler(data, ws, req) //обработка сообщения
-    
+                    try{
+                        message = String(message) //преобрахование сообщение
+                        const data = JSON.parse(message); // парсинг сообщения
+        
+                        MessageHandler.handler(data, ws, req) //обработка сообщения
+                    }
+                    catch(e){
+                        ws.send(JSON.stringify({"route": "onError", "payload": "jsonError"}))
+                    }
                 })
             })
             .catch( e => {
