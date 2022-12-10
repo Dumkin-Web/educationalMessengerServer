@@ -15,7 +15,8 @@ const server = http.createServer(app); //creating http Server
 
 const wsServer = new webSocketServer(server); //creating WebSocket Server
 
-app.use(express.json());
+app.use(express.json({limit: '50mb'}));
+app.use(express.urlencoded({limit: '50mb'}));
 app.use('/auth', authRouter) //роутер для регистрации и авторизации
 app.use('/api', mainRouter) //роутер для доступа к функциям сервера
 

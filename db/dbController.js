@@ -63,10 +63,10 @@ class dbController{
     }
 
     //
-    static newUser(username, name, surname, phone, password, imageBlob) { //creating new user
+    static newUser(username, name, surname, phone, password, imageBASE64) { //creating new user
         try{
             if(!this.users[phone]){
-                this.users[phone] = new User(username, name, surname, password, imageBlob);
+                this.users[phone] = new User(username, name, surname, password, imageBASE64);
                 console.log("new user created");
                 this.#saveData();
                 return true
@@ -161,6 +161,10 @@ class dbController{
         }
     }
 
+    static getUserData(phone){
+        return User.getNonPrivateInfo(this.users[phone])
+    }
+
     //WS
     static savePhoneAndWS(phone, ws){
         try{
@@ -183,7 +187,7 @@ class dbController{
         }
     }
 
-    static newDialog(phone, {dialog_name, type, members, imageBlob, admin_id}){
+    static newDialog(phone, {dialog_name, type, members, imageBASE64, admin_id}){
         try{
             const newMembers = new Set();
             newMembers.add(phone)
@@ -193,7 +197,7 @@ class dbController{
             })
             members = Array.from(newMembers)
 
-            const newDialog = new Dialog(dialog_name, type, members, imageBlob, admin_id)
+            const newDialog = new Dialog(dialog_name, type, members, imageBASE64, admin_id)
             this.dialogs[newDialog.dialog_id] = newDialog
 
             members.forEach((phone) =>{

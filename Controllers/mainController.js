@@ -56,6 +56,19 @@ class mainController{
             return res.status(401).json({message: "Пользователь не авторизован"})
         }
     }
+
+    getUserData(req, res){
+        try{
+            console.log(req.query)
+            //const decodeData = jwtVerify(req.headers.authorization.split(' ')[1])
+
+            const responseData = dbController.getUserData(req.query["phone"]);
+            responseData.phone = req.query["phone"]
+            return res.status(200).json({message: 'Данные пользователя', data: responseData})
+        } catch(e){
+            return res.status(401).json({message: "Пользователь не авторизован"})
+        }
+    }
 }
 
 module.exports = new mainController()
