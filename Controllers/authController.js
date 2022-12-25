@@ -34,7 +34,6 @@ class authController{
 
     async login(req, res){
         try{
-            console.log("login")
             const {phone, password} = req.body
             const user = dbController.userExistence(phone);
             if(user && bcryptjs.compareSync(password, user.password)){

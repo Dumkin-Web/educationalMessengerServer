@@ -6,7 +6,6 @@ module.exports = class MessageHandler{
 
     static async jwtVerify(req, ws){ //проверка токена
         const token = req.headers.authorization.split(' ')[1];
-
         return new Promise((resolve, reject) => {
             if(!token){
                  reject(new Error('Токен отсутствует'))
@@ -96,12 +95,10 @@ module.exports = class MessageHandler{
     static newDialog({payload}, ws){
         try{
             console.log("New dialog");
-            let dialogExists = false
-            if(payload.type == "Dialog"){ //Если создается диалог, то проверяется наличие такового в БД
-                dbController.users[ws.userPhonePrivateProperty].dialogsIds.forEach( dialog_id => {
-                    if(dbController.users[payload.members[0]].dialogsIds.includes(dialog_id)) dialogExists = true
-                })
-            }
+            let dialogExists = false//Если создается диалог, то проверяется наличие такового в БД
+            dbController.users[ws.userPhonePrivateProperty].dialogsIds.forEach( dialog_id => {
+                if(dbController.users[payload.members[0]].dialogsIds.includes(dialog_id)) dialogExists = true
+            })
 
             if(!dialogExists) //Если диалог существует, то новый не создается
             {

@@ -2,6 +2,7 @@ const express = require('express');
 const dotenv = require('dotenv');
 const http = require("http");
 const webSocketServer = require('./WSService/webSocketServer');
+var cors = require('cors');
 const dbController = require('./db/dbController');
 const authRouter = require('./Routers/authRouter');
 const mainRouter = require('./Routers/mainRouter');
@@ -17,6 +18,9 @@ const wsServer = new webSocketServer(server); //creating WebSocket Server
 
 app.use(express.json({limit: '50mb'}));
 app.use(express.urlencoded({limit: '50mb'}));
+app.use(cors({
+    "origin": "*",
+}))
 app.use('/auth', authRouter) //роутер для регистрации и авторизации
 app.use('/api', mainRouter) //роутер для доступа к функциям сервера
 

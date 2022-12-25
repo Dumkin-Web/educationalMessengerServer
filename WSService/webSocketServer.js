@@ -8,6 +8,12 @@ module.exports = class webSocketServer{
 
         this.wsServer.on('connection', (ws,req) => {
 
+            const params = new URLSearchParams(req.url.replace("/", ""));
+            const token = params.get("token")
+            if(token){
+                req.headers.authorization = "Bearer " + token
+            }
+
             MessageHandler.jwtVerify(req, ws) //проверка токена и выдача нового
             .then((phone) => {
                 dbController.savePhoneAndWS(phone, ws); //сохранение ассоциации телефона и соккета в статическую переменную 

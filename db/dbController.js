@@ -195,6 +195,11 @@ class dbController{
                 if(!this.userExistence(member)) throw new Error('Пользователь не существует')
                 newMembers.add(member)
             })
+            
+            if(newMembers.size == 1){
+                throw new Error('Нельзя создать диалог с самим собой')
+            }
+            console.log(newMembers);
             members = Array.from(newMembers)
 
             const newDialog = new Dialog(dialog_name, type, members, imageBASE64, admin_id)
