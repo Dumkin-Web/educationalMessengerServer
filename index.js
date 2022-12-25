@@ -1,6 +1,6 @@
 const express = require('express');
 const dotenv = require('dotenv');
-const http = require("http");
+const http = require("https");
 const webSocketServer = require('./WSService/webSocketServer');
 var cors = require('cors');
 const dbController = require('./db/dbController');
