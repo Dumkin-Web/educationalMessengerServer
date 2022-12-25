@@ -1,23 +1,18 @@
 const express = require('express');
 const dotenv = require('dotenv');
-const https = require("https");
-const fs = require("fs")
+const http = require("http");
 const webSocketServer = require('./WSService/webSocketServer');
 var cors = require('cors');
 const dbController = require('./db/dbController');
 const authRouter = require('./Routers/authRouter');
 const mainRouter = require('./Routers/mainRouter');
 
-let options = {
-    key: fs.readFileSync('/etc/letsencrypt/live/nikitadumkin.fun/privkey.pem'),
-    cert: fs.readFileSync('/etc/letsencrypt/live/nikitadumkin.fun/cert.pem'),
-};
 
 dotenv.config();
 const PORT = process.env.PORT || 3000;
 
 const app = express();
-const server = https.createServer(options, app); //creating http Server
+const server = http.createServer(app); //creating http Server
 
 const wsServer = new webSocketServer(server); //creating WebSocket Server
 
